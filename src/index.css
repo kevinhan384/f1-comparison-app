@@ -1,13 +1,32 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: regularFont;
+  src: url(./Formula1-Regular.ttf);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* {
+  margin: 0;
+  font-family: regularFont;
+}
+
+.header {
+  padding-top: 20px;
+  padding-bottom: 15px;
+  text-align: center;
+  background-color: #FF1E00;
+  color: white;
+}
+
+.content {
+  max-width: 1200px;
+}
+
+.footer {
+  background-color: #15151E;
+  color: white;
+  padding: 15px;
+  font-size: x-small;
+}
+
+.footer a {
+  color: #FF1E00;
 }
