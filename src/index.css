@@ -20,6 +20,8 @@
   max-width: 1200px;
 }
 
+.content button {}
+
 .footer {
   background-color: #15151E;
   color: white;
