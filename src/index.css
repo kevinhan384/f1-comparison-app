@@ -17,10 +17,19 @@
 }
 
 .content {
-  max-width: 1200px;
+  display: flex;
 }
 
-.content button {}
+.content .d1,
+.content .d2 {
+  flex: 1;
+  max-width: 50%;
+}
+
+.content .d1 .image1 img,
+.content .d2 .image2 img {
+  max-width: 80%;
+}
 
 .footer {
   background-color: #15151E;
@@ -31,4 +40,39 @@
 
 .footer a {
   color: #FF1E00;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 200px;
+  position: relative;
+  align-self: center;
+}
+
+.dropdown .optionsDropdown {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.dropdown .optionsDropdown.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown .optionsDropdown button {
+  display: flex;
+  justify-content: space-between;
+  text-align: start;
+  cursor: pointer;
+}
+
+.dropdown .optionsDropdown button:hover {
+  background-color: grey;
 }
