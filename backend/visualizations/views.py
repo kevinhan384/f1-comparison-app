@@ -11,22 +11,28 @@ import base64
 
 def plot_laptimes(request):
     try:
+        driver1 = request.GET.get('driver1')
+        driver2 = request.GET.get('driver2')
+
+        if not driver1 or not driver2:
+            return JsonResponse({'error': 'Missing one or more parameters!'}, status=400)
+
         fastf1.plotting.setup_mpl(misc_mpl_mods=False)
         session = fastf1.get_session(2021, 'Spanish Grand Prix', 'Q')
         session.load()
 
-        ver_lap = session.laps.pick_driver('VER').pick_fastest()
-        ham_lap = session.laps.pick_driver('HAM').pick_fastest()
+        driver1_lap = session.laps.pick_driver(driver1).pick_fastest()
+        driver2_lap = session.laps.pick_driver(driver2).pick_fastest()
 
-        ver_tel = ver_lap.get_car_data().add_distance()
-        ham_tel = ham_lap.get_car_data().add_distance()
+        driver1_tel = driver1_lap.get_car_data().add_distance()
+        driver2_tel = driver2_lap.get_car_data().add_distance()
 
-        rbr_color = fastf1.plotting.team_color('RBR')
-        mer_color = fastf1.plotting.team_color('MER')
+        driver1_color = fastf1.plotting.team_color('RBR')
+        driver2_color = fastf1.plotting.team_color('MER')
 
         fig, ax = plt.subplots()
-        ax.plot(ver_tel['Distance'], ver_tel['Speed'], color=rbr_color, label='VER')
-        ax.plot(ham_tel['Distance'], ham_tel['Speed'], color=mer_color, label='HAM')
+        ax.plot(driver1_tel['Distance'], driver1_tel['Speed'], color=driver1_color, label=driver1)
+        ax.plot(driver2_tel['Distance'], driver2_tel['Speed'], color=driver2_color, label=driver2)
 
         ax.set_xlabel('Distance in m')
         ax.set_ylabel('Speed in km/h')

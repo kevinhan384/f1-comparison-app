@@ -6,8 +6,6 @@ import Footer from './Footer'
 import Dropdown from './Dropdown'
 
 function App() {
-  const validDrivers = ["Lewis Hamilton", "Max Verstappen"];
-
   const [driver1, setDriver1] = useState('');
   const [driver2, setDriver2] = useState('');
   const [race, setRace] = useState('');
@@ -15,8 +13,30 @@ function App() {
 
   const [image, setImage] = useState('');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/visualizations/plot_laptimes/')
+  // useEffect(() => {
+  //   axios.get('http://127.0.0.1:8000/visualizations/plot_laptimes', {
+  //     params: {
+  //       driver1: driver1,
+  //       driver2: driver2,
+  //     }
+  //   })
+  //     .then(response => {
+  //       if (response.data.image) {
+  //         setImage(response.data.image);
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error('Error fetching the F1 data:', error);
+  //     });
+  // }, []);
+
+  const handleClick = () => {
+    axios.get('http://127.0.0.1:8000/visualizations/plot_laptimes', {
+      params: {
+        driver1: driver1,
+        driver2: driver2,
+      }
+    })
       .then(response => {
         if (response.data.image) {
           setImage(response.data.image);
@@ -25,13 +45,13 @@ function App() {
       .catch(error => {
         console.error('Error fetching the F1 data:', error);
       });
-  }, []);
+  }
 
   return (
     <div className="App">
       <Header />
       <div className='intro'>
-        <p>Welcome to F1 Driver Comparison! With this app, you can compare two drivers head-to-head with past statistics and real-time telemetry.</p>
+        <p>Welcome to F1 Driver Comparison! With this app, you can compare two drivers head-to-head with past statistics and telemetry data.</p>
       </div>
       <div className="content">
         <div className='d1'>
@@ -61,8 +81,8 @@ function App() {
             }
           </div>
         </div>
-
-        {image ? <img src={`data:image/png;base64,${image}`} alt="F1 Plot" /> : <p>Loading...</p>}
+        <button onClick={handleClick}>Click me</button>
+        {image ? <img src={`data:image/png;base64,${image}`} alt="F1 Plot" /> : <p>Please try a different combination of drivers or races.</p>}
 
       </div>
       <Footer />
