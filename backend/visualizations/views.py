@@ -1,22 +1,28 @@
 from django.shortcuts import render
+from rest_framework import generics
+from .models import UserSelection
+from . serializers import UserSelectionSerializer
 
 # Create your views here.
+import fastf1
+fastf1.Cache.enable_cache('backend/')
 import fastf1.plotting
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from django.http import JsonResponse, HttpResponse
 import io
 import base64
+from django.http import JsonResponse
 
-def plot_laptimes(request):
-    try:
-        driver1 = request.GET.get('driver1')
-        driver2 = request.GET.get('driver2')
+class UserSelectionList(generics.ListCreateAPIView):
+    queryset = UserSelection.objects.all()
+    serializer_class = UserSelectionSerializer
 
-        if not driver1 or not driver2:
-            return JsonResponse({'error': 'Missing one or more parameters!'}, status=400)
-
+    def get(self, request):
+        latest_selection = UserSelection.objects.all().last()
+        driver1 = latest_selection.driver1
+        driver2 = latest_selection.driver2
+        
         fastf1.plotting.setup_mpl(misc_mpl_mods=False)
         session = fastf1.get_session(2021, 'Spanish Grand Prix', 'Q')
         session.load()
@@ -48,5 +54,9 @@ def plot_laptimes(request):
         buf.close()
 
         return JsonResponse({'image': image_base64})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+
+class UserSelectionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserSelection.objects.all()
+    serializer_class = UserSelectionSerializer
+    lookup_field = 'pk'
+    

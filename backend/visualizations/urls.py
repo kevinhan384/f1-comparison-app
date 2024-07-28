@@ -1,6 +1,9 @@
 from django.urls import path
-from .views import plot_laptimes
+# from .views import plot_laptimes
+from . import views
 
 urlpatterns = [
-    path('plot_laptimes/', plot_laptimes, name='plot_laptimes')
+    # path('plot_laptimes/', plot_laptimes, name='plot_laptimes')
+    path('userselections/', views.UserSelectionList.as_view(), name='userselections-view'),
+    path('userselections/<int:pk>/', views.UserSelectionRetrieveUpdateDestroy.as_view(), name='userselections-update')
 ]

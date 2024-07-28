@@ -30,13 +30,12 @@ function App() {
   //     });
   // }, []);
 
-  const handleClick = () => {
-    axios.get('http://127.0.0.1:8000/visualizations/plot_laptimes', {
-      params: {
-        driver1: driver1,
-        driver2: driver2,
-      }
+  const handleClick = async () => {
+    await axios.post('http://127.0.0.1:8000/userselections/', {
+      driver1: driver1,
+      driver2: driver2,
     })
+    axios.get('http://127.0.0.1:8000/userselections/')
       .then(response => {
         if (response.data.image) {
           setImage(response.data.image);
