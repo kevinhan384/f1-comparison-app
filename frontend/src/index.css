@@ -20,14 +20,14 @@
   display: flex;
 }
 
-.content .d1,
-.content .d2 {
+.content .driver1,
+.content .driver2 {
   flex: 1;
   max-width: 50%;
 }
 
-.content .d1 .image1 img,
-.content .d2 .image2 img {
+.content .driver1 .image1 img,
+.content .driver2 .image2 img {
   max-width: 80%;
 }
 

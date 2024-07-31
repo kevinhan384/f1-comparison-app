@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .models import UserSelection
-from . serializers import UserSelectionSerializer
+from .serializers import UserSelectionSerializer
 
 # Create your views here.
 import fastf1
@@ -22,9 +22,10 @@ class UserSelectionList(generics.ListCreateAPIView):
         latest_selection = UserSelection.objects.all().last()
         driver1 = latest_selection.driver1
         driver2 = latest_selection.driver2
+        year = latest_selection.year
         
         fastf1.plotting.setup_mpl(misc_mpl_mods=False)
-        session = fastf1.get_session(2021, 'Spanish Grand Prix', 'Q')
+        session = fastf1.get_session(year, 'Spanish Grand Prix', 'Q')
         session.load()
 
         driver1_lap = session.laps.pick_driver(driver1).pick_fastest()
@@ -33,8 +34,8 @@ class UserSelectionList(generics.ListCreateAPIView):
         driver1_tel = driver1_lap.get_car_data().add_distance()
         driver2_tel = driver2_lap.get_car_data().add_distance()
 
-        driver1_color = fastf1.plotting.team_color('RBR')
-        driver2_color = fastf1.plotting.team_color('MER')
+        driver1_color = fastf1.plotting.driver_color(driver1)
+        driver2_color = fastf1.plotting.driver_color(driver2)
 
         fig, ax = plt.subplots()
         ax.plot(driver1_tel['Distance'], driver1_tel['Speed'], color=driver1_color, label=driver1)
