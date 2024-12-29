@@ -76,3 +76,17 @@
 .dropdown .optionsDropdown button:hover {
   background-color: grey;
 }
+
+.telemetryPlot img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.positionPlot img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}

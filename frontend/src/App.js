@@ -9,6 +9,8 @@ import RaceDropdown from './RaceDropdown';
 import SessionDropdown from './SessionDropdown';
 
 function App() {
+  const baseUrl = 'http://127.0.0.1:8000/visualizations/';
+
   const [driver1, setDriver1] = useState('');
   const [driver2, setDriver2] = useState('');
   const [race, setRace] = useState('');
@@ -53,7 +55,7 @@ function App() {
         setImage('');
         console.error('Error fetching the F1 data:', error);
       });
-    axios.get('http://127.0.0.1:8000/positionplot/')
+    axios.get('http://127.0.0.1:8000/visualizations/')
       .then(response => {
         if (response.data.image) {
           setPositionImage(response.data.image);
