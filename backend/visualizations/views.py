@@ -45,19 +45,24 @@ def get_drivers(request, year, racename):
 @api_view(["GET"])
 def get_laps(request, year, racename, driver1, driver2):
     try:
-        serializer = UserSelectionSerializer(data={ "year" : year, "racename" : racename, "driver1" : driver1, "driver2" : driver2 })
+        # serializer = UserSelectionSerializer(data={ "year" : year, "racename" : racename, "driver1" : driver1, "driver2" : driver2 })
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # if not serializer.is_valid():
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer.save()
+        # serializer.save()
 
         session = fastf1.get_session(year, racename, 'R')
         session.load(telemetry=False, weather=False)
 
-        data = {}
-        data[driver1] = session.laps.pick_driver(driver1).to_json()
-        data[driver2] = session.laps.pick_driver(driver2).to_json()
+        # data = {}
+        # data[f"position{driver1}"] = session.laps.pick_driver(driver1).to_json()
+        # data[f"position{driver2}"] = session.laps.pick_driver(driver2).to_json()
+        # data[f"color{driver1}"] = fastf1.plotting.driver_color(driver1)
+        # data[f"color{driver2}"] = fastf1.plotting.driver_color(driver2)
+
+        data = list(session.laps.pick_driver(driver2)['Position'])
+        print(session.laps.pick_driver(driver2)["Position"])
 
         return Response(json.dumps(data), status=status.HTTP_200_OK)
     except Exception as err:
