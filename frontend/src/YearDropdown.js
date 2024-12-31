@@ -25,7 +25,7 @@ const YearDropdown = ({ onSelect }) => {
         {
             id: 0,
             label: "Select Year",
-            value: -1,
+            value: 1,
         },
         {
             id: 1,
@@ -65,7 +65,7 @@ const YearDropdown = ({ onSelect }) => {
             <div className={`optionsDropdown ${dropdownToggled ? 'visible' : ''}`}>
                 {dropdownOptions.map((o, i) => {
                     return (
-                        <button className={`${selectedOption.id === o.id ? 'selected' : ''}`} onClick={() => {
+                        <button className={`${selectedOption.id === o.id ? 'selected' : ''}`} key={i} onClick={() => {
                             setSelectedOption(o);
                             onSelect(o.value);
                             setDropdownToggled(false);

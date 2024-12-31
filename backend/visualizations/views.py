@@ -22,7 +22,7 @@ def get_races(request, year):
     try:
         races = fastf1.get_event_schedule(year)["EventName"].to_json()
 
-        return Response(json.dumps(races), status=status.HTTP_200_OK)
+        return Response(races, status=status.HTTP_200_OK)
     except Exception as err:
         return Response(json.dumps(str(err)), status=status.HTTP_400_BAD_REQUEST)
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 import Header from './Header';
@@ -6,66 +6,73 @@ import Footer from './Footer';
 import DriverDropdown from './DriverDropdown';
 import YearDropdown from './YearDropdown';
 import RaceDropdown from './RaceDropdown';
-import SessionDropdown from './SessionDropdown';
 
 function App() {
   const baseUrl = 'http://127.0.0.1:8000/visualizations/';
 
-  const [driver1, setDriver1] = useState('');
-  const [driver2, setDriver2] = useState('');
+  const [driver1, setDriver1] = useState(0);
+  const [driver2, setDriver2] = useState(0);
   const [race, setRace] = useState('');
-  const [session, setSession] = useState('');
-  const [year, setYear] = useState(2018);
+  const [year, setYear] = useState(0);
 
-  const [image, setImage] = useState('');
-  const [positionImage, setPositionImage] = useState('');
+  const [races, setRaces] = useState([]);
+  const [drivers, setDrivers] = useState([]);
 
-  // useEffect(() => {
-  //   axios.get('http://127.0.0.1:8000/visualizations/plot_laptimes', {
-  //     params: {
-  //       driver1: driver1,
-  //       driver2: driver2,
-  //     }
-  //   })
-  //     .then(response => {
-  //       if (response.data.image) {
-  //         setImage(response.data.image);
-  //       }
-  //     })
-  //     .catch(error => {
-  //       console.error('Error fetching the F1 data:', error);
-  //     });
-  // }, []);
+  // const [image, setImage] = useState('');
+  // const [positionImage, setPositionImage] = useState('');
 
-  const handleClick = async () => {
-    await axios.post('http://127.0.0.1:8000/userselections/', {
-      driver1: driver1,
-      driver2: driver2,
-      year: year,
-      race: race,
-      session: session
-    })
-    axios.get('http://127.0.0.1:8000/speedplot/')
+  const handleYearSelect = async (e) => {
+    setYear(e);
+    axios.get(baseUrl + `races/${e}/`)
       .then(response => {
-        if (response.data.image) {
-          setImage(response.data.image);
+        if (response.data) {
+          let obj = JSON.parse(response.data);
+          let res = [];
+
+          for (const key in obj) {
+            res.push(
+              {
+                id: Number(key),
+                label: obj[key],
+                value: obj[key]
+              }
+            );
+          }
+          setRaces(res);
         }
       })
       .catch(error => {
-        setImage('');
-        console.error('Error fetching the F1 data:', error);
-      });
-    axios.get('http://127.0.0.1:8000/visualizations/')
+        setRaces([]);
+        console.error('Error fetching the races:', error);
+      });;
+  };
+
+  const handleRaceSelect = async (e) => {
+    setRace(e);
+    axios.get(baseUrl + `drivers/${year}/${e}/`)
       .then(response => {
-        if (response.data.image) {
-          setPositionImage(response.data.image);
+        if (response.data) {
+          let obj = JSON.parse(response.data);
+          let res = []
+
+          for (const key in obj) {
+            let val = JSON.parse(obj[key]);
+            res.push(
+              {
+                id: Number(val['DriverNumber']),
+                label: val['FullName'],
+                value: Number(val['DriverNumber'])
+              }
+            );
+          }
+          setDrivers(res);
         }
       })
       .catch(error => {
-        setPositionImage('');
-        console.error('Error fetching the F1 data:', error);
-      });
-  }
+        setDrivers([]);
+        console.error('Error fetching the drivers:', error);
+      });;
+  };
 
   return (
     <div className="App">
@@ -73,10 +80,19 @@ function App() {
       <div className='intro'>
         <p>Welcome to F1 Driver Comparison! With this app, you can compare two drivers head-to-head with past statistics and telemetry data.</p>
       </div>
+
+      <div className='year'>
+        <YearDropdown onSelect={handleYearSelect} />
+      </div>
+
+      <div className='race'>
+        <RaceDropdown dropdownOptions={races} onSelect={handleRaceSelect} />
+      </div>
+
       <div className="content">
         <div className='driver1'>
           <div className='input1'>
-            <DriverDropdown onSelect={setDriver1} />
+            <DriverDropdown dropdownOptions={drivers} onSelect={setDriver1} />
           </div>
           <div className='image1'>
             {driver1.length > 0 &&
@@ -87,7 +103,7 @@ function App() {
 
         <div className='driver2'>
           <div className='input2'>
-            <DriverDropdown onSelect={setDriver2} />
+            <DriverDropdown dropdownOptions={drivers} onSelect={setDriver2} />
           </div>
           <div className='image2'>
             {driver2.length > 0 &&
@@ -98,29 +114,14 @@ function App() {
 
       </div>
 
-      <div className='year'>
-        <YearDropdown onSelect={setYear} />
-      </div>
 
-      <div className='race'>
-        <RaceDropdown onSelect={setRace} />
-      </div>
-
-      <div className='session'>
-        <SessionDropdown onSelect={setSession} />
-      </div>
-
-      <div className='button'>
-        <button onClick={handleClick}>Click me</button>
-      </div>
-
-      <div className='telemetryPlot'>
+      {/* <div className='telemetryPlot'>
         {image ? <img src={`data:image/png;base64,${image}`} alt="F1 Plot" /> : <p>This selection does not exist. Please try a different combination of drivers or race.</p>}
       </div>
 
       <div className='positionPlot'>
         {image ? <img src={`data:image/png;base64,${positionImage}`} alt="F1 Plot" /> : <p>This selection does not exist. Please try a different combination of drivers or race.</p>}
-      </div>
+      </div> */}
 
       <Footer />
     </div>
