@@ -7,9 +7,9 @@ from .serializers import UserSelectionSerializer
 
 import fastf1
 fastf1.Cache.enable_cache("visualizations/cache")
+from fastf1 import plotting as plotting
 
 import json
-from collections import defaultdict
 
 @api_view(["GET"])
 def get_user_selections(request):
@@ -54,15 +54,64 @@ def get_laps(request, year, racename, driver1, driver2):
 
         session = fastf1.get_session(year, racename, 'R')
         session.load(telemetry=False, weather=False)
+        
+        n = session.total_laps
 
-        # data = {}
-        # data[f"position{driver1}"] = session.laps.pick_driver(driver1).to_json()
-        # data[f"position{driver2}"] = session.laps.pick_driver(driver2).to_json()
-        # data[f"color{driver1}"] = fastf1.plotting.driver_color(driver1)
-        # data[f"color{driver2}"] = fastf1.plotting.driver_color(driver2)
+        d1_laps = session.laps.pick_driver(driver1).to_dict()['LapNumber']
+        d1_posns = session.laps.pick_driver(driver1).to_dict()['Position']
 
-        data = list(session.laps.pick_driver(driver2)['Position'])
-        print(session.laps.pick_driver(driver2)["Position"])
+        d1_combined = {}
+        for key in d1_laps:
+            if d1_posns[key] == d1_posns[key]:
+                d1_combined[d1_laps[key]] = d1_posns[key]
+
+        d2_laps = session.laps.pick_driver(driver2).to_dict()['LapNumber']
+        d2_posns = session.laps.pick_driver(driver2).to_dict()['Position']
+
+        d2_combined = {}
+        for key in d2_laps:
+            if d2_posns[key] == d2_posns[key]:
+                d2_combined[d2_laps[key]] = d2_posns[key]
+
+        posns = []
+        for i in range(1, n + 1):
+            if i in d1_combined and i in d2_combined:
+                posns.append(
+                    {
+                        'Lap': i,
+                        'driver1Position': d1_combined[i],
+                        'driver2Position': d2_combined[i]
+                    }
+                )
+            elif i in d1_combined and i not in d2_combined:
+                posns.append(
+                    {
+                        'Lap': i,
+                        'driver1Position': d1_combined[i],
+                        'driver2Position': None
+                    }
+                )
+            elif i not in d1_combined and i in d2_combined:
+                posns.append(
+                    {
+                        'Lap': i,
+                        'driver1Position': None,
+                        'driver2Position': d2_combined[i]
+                    }
+                )
+            else:
+                posns.append(
+                    {
+                        'Lap': i,
+                        'driver1Position': None,
+                        'driver2Position': None
+                    }
+                )
+
+        data = {}
+        data['positions'] = posns
+        data[f"colorDriver1"] = plotting.driver_color(driver1)
+        data[f"colorDriver2"] = plotting.driver_color(driver2)
 
         return Response(json.dumps(data), status=status.HTTP_200_OK)
     except Exception as err:

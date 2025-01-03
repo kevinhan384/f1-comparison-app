@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { PureComponent, useState } from 'react';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -20,6 +20,8 @@ function App() {
   const [drivers, setDrivers] = useState([]);
 
   const [laps, setLaps] = useState([]);
+  const [driver1Color, setDriver1Color] = useState('#8884d8');
+  const [driver2Color, setDriver2Color] = useState('#82ca9d');
   // const [image, setImage] = useState('');
   // const [positionImage, setPositionImage] = useState('');
 
@@ -81,7 +83,11 @@ function App() {
     axios.get(baseUrl + `laps/${year}/${race}/${driver1}/${driver2}/`)
       .then(response => {
         if (response.data) {
-          console.log(response.data);
+          let data = JSON.parse(response.data);
+
+          setLaps(data['positions']);
+          setDriver1Color(data['colorDriver1']);
+          setDriver2Color(data['colorDriver2']);
         }
       })
       .catch(error => {
@@ -134,20 +140,20 @@ function App() {
 
       {driver1.length !== 0 && driver2.length !== 0 && <button type='button' onClick={handleLapsButton}>Click me!</button>}
 
-      <ResponsiveContainer width='100%' height={'100%'}>
-        <LineChart width={500} height={300}>
-          <Tooltip />
-          <Legend />
-        </LineChart>
-      </ResponsiveContainer>
-
-      {/* <div className='telemetryPlot'>
-        {image ? <img src={`data:image/png;base64,${image}`} alt="F1 Plot" /> : <p>This selection does not exist. Please try a different combination of drivers or race.</p>}
+      <div style={{ width: "100%", height: "300px" }}>
+        {laps.length !== 0 &&
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={laps}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="Lap" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="driver1Position" stroke={driver1Color} activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="driver2Position" stroke={driver2Color} />
+            </LineChart>
+          </ResponsiveContainer>}
       </div>
-
-      <div className='positionPlot'>
-        {image ? <img src={`data:image/png;base64,${positionImage}`} alt="F1 Plot" /> : <p>This selection does not exist. Please try a different combination of drivers or race.</p>}
-      </div> */}
 
       <Footer />
     </div>
