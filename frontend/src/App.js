@@ -22,6 +22,8 @@ function App() {
   const [laps, setLaps] = useState([]);
   const [driver1Color, setDriver1Color] = useState('#8884d8');
   const [driver2Color, setDriver2Color] = useState('#82ca9d');
+
+  const [lap, setLap] = useState(1);
   // const [image, setImage] = useState('');
   // const [positionImage, setPositionImage] = useState('');
 
@@ -96,6 +98,12 @@ function App() {
       });;
   }
 
+  const handleLapSelect = (e) => {
+    if (e && e.activeLabel) {
+      setLap(e.activeLabel);
+    }
+  }
+
   return (
     <div className="App">
       <Header />
@@ -143,7 +151,7 @@ function App() {
       <div style={{ width: "100%", height: "300px" }}>
         {laps.length !== 0 &&
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={laps}>
+            <LineChart data={laps} onClick={handleLapSelect}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="Lap" />
               <YAxis />
