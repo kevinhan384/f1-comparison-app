@@ -24,8 +24,7 @@ function App() {
   const [driver2Color, setDriver2Color] = useState('#82ca9d');
 
   const [lap, setLap] = useState(1);
-  // const [image, setImage] = useState('');
-  // const [positionImage, setPositionImage] = useState('');
+  const [tel, setTel] = useState([]);
 
   const handleYearSelect = async (e) => {
     setYear(e);
@@ -93,15 +92,26 @@ function App() {
         }
       })
       .catch(error => {
-        // setDrivers([]);
+        setLaps([]);
         console.error('Error fetching the laps:', error);
       });;
   }
 
   const handleLapSelect = (e) => {
-    if (e && e.activeLabel) {
-      setLap(e.activeLabel);
-    }
+    axios.get(baseUrl + `tel/${year}/${race}/${driver1}/${driver2}/${e.activeLabel}/`)
+      .then(response => {
+        if (response.data) {
+          let data = JSON.parse(response.data);
+
+          setTel(data['tel']);
+          setDriver1Color(data['colorDriver1']);
+          setDriver2Color(data['colorDriver2']);
+        }
+      })
+      .catch(error => {
+        setTel([]);
+        console.error('Error fetching the telemetry:', error);
+      });;
   }
 
   return (
@@ -148,7 +158,7 @@ function App() {
 
       {driver1.length !== 0 && driver2.length !== 0 && <button type='button' onClick={handleLapsButton}>Click me!</button>}
 
-      <div style={{ width: "100%", height: "300px" }}>
+      <div style={{ width: "500px", height: "300px" }}>
         {laps.length !== 0 &&
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={laps} onClick={handleLapSelect}>
@@ -159,6 +169,21 @@ function App() {
               <Legend />
               <Line type="monotone" dataKey="driver1Position" stroke={driver1Color} activeDot={{ r: 8 }} />
               <Line type="monotone" dataKey="driver2Position" stroke={driver2Color} />
+            </LineChart>
+          </ResponsiveContainer>}
+      </div>
+
+      <div style={{ width: "500px", height: "300px" }}>
+        {tel.length !== 0 &&
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={tel}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="distance" minTickGap={9999999} />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="speedDriver1" stroke={driver1Color} activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="speedDriver2" stroke={driver2Color} />
             </LineChart>
           </ResponsiveContainer>}
       </div>

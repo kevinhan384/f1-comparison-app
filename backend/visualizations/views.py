@@ -10,6 +10,7 @@ fastf1.Cache.enable_cache("visualizations/cache")
 from fastf1 import plotting as plotting
 
 import json
+import pandas as pd
 
 @api_view(["GET"])
 def get_user_selections(request):
@@ -45,13 +46,6 @@ def get_drivers(request, year, racename):
 @api_view(["GET"])
 def get_laps(request, year, racename, driver1, driver2):
     try:
-        # serializer = UserSelectionSerializer(data={ "year" : year, "racename" : racename, "driver1" : driver1, "driver2" : driver2 })
-
-        # if not serializer.is_valid():
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        # serializer.save()
-
         session = fastf1.get_session(year, racename, 'R')
         session.load(telemetry=False, weather=False)
         
@@ -110,6 +104,37 @@ def get_laps(request, year, racename, driver1, driver2):
 
         data = {}
         data['positions'] = posns
+        data[f"colorDriver1"] = plotting.driver_color(driver1)
+        data[f"colorDriver2"] = plotting.driver_color(driver2)
+
+        return Response(json.dumps(data), status=status.HTTP_200_OK)
+    except Exception as err:
+        return Response(json.dumps(str(err)), status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["GET"])
+def get_tel(request, year, racename, driver1, driver2, lap):
+    try:
+        session = fastf1.get_session(year, racename, 'R')
+        session.load()
+
+        driver1_lap = session.laps.pick_laps(lap).pick_driver(driver1)
+        driver2_lap = session.laps.pick_laps(lap).pick_driver(driver2)
+
+        driver1_tel = driver1_lap.get_car_data().add_distance()
+        driver2_tel = driver2_lap.get_car_data().add_distance()
+
+        driver1_speed = driver1_tel[['Distance', 'Speed']].rename(columns={"Speed": "speedDriver1"})
+        driver2_speed = driver2_tel[['Distance', 'Speed']].rename(columns={"Speed": "speedDriver2"})
+
+        combined_speed = pd.merge(
+            driver1_speed, 
+            driver2_speed, 
+            on='Distance', 
+            how='outer'
+        ).rename(columns={"Distance": "distance"}).to_dict(orient='records')
+
+        data = {}
+        data['tel'] = [{k: (None if pd.isna(v) else v) for k, v in row.items()} for row in combined_speed]
         data[f"colorDriver1"] = plotting.driver_color(driver1)
         data[f"colorDriver2"] = plotting.driver_color(driver2)
 
